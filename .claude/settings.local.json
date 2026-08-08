@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:open.spotify.com)",
+      "WebFetch(domain:lawnchairsports.org)",
+      "Bash(curl -s \"https://itunes.apple.com/lookup?id=1840305521\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); r=d['results'][0]; print\\(r.get\\('feedUrl'\\)\\); print\\(r.get\\('artworkUrl600'\\)\\); print\\(r.get\\('trackCount'\\), 'episodes'\\); print\\(r.get\\('genres'\\)\\)\")",
+      "WebFetch(domain:lawnchairsportsco.com)",
+      "Bash(curl -sL \"https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/44370169/44370169-1757115510261-29e4cc12b60bf.jpg\" -o assets/artwork.jpg)",
+      "Bash(sips -Z 800 assets/artwork.jpg --out assets/artwork-800.jpg)",
+      "Bash(sips -Z 240 assets/artwork.jpg --out assets/artwork-240.jpg)",
+      "Bash(python3 update-episodes.py)",
+      "Bash(curl -sL \"https://www.youtube.com/@LawnChairSports\" -H \"User-Agent: Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36\")"
+    ]
+  }
+}

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch — Lawn Chair Sports</title>
+<meta name="description" content="Watch Lawn Chair Sports on YouTube — full video episodes and shorts. Unfiltered takes, hot debates, and real sports talk.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Watch — Lawn Chair Sports">
+<meta property="og:description" content="Full video episodes and shorts from the Lawn Chair Sports YouTube channel.">
+<meta property="og:image" content="assets/artwork-800.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/logo-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <nav class="nav">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-256.png" alt="Lawn Chair Sports logo">
+      <span>Lawn Chair Sports</span>
+    </a>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="episodes.html">Episodes</a>
+      <a href="videos.html" class="active">Watch</a>
+      <a href="merch.html">Merch</a>
+      <a href="index.html#about">About</a>
+    </div>
+    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count">0</span></button>
+  </nav>
+</header>
+<div class="webbing"></div>
+
+<section class="hero" style="padding: 0;">
+  <div class="wrap" style="padding-top: 44px; padding-bottom: 44px;">
+    <span style="display:inline-block;background:var(--gold);color:var(--green-deep);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:2px;padding:5px 14px;border-radius:999px;margin-bottom:14px;">📺 Now In Video</span>
+    <h1 style="font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 10px;">Watch the Takes Happen</h1>
+    <p style="opacity:.9; max-width: 42rem;">Full video episodes and shorts from the Lawn Chair Sports YouTube channel. Pull up a chair and hit play — or
+      <a href="https://www.youtube.com/@LawnChairSports?sub_confirmation=1" target="_blank" rel="noopener" style="color: var(--gold); font-weight: 700;">subscribe on YouTube</a>.</p>
+  </div>
+</section>
+<div class="webbing"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="toolbar">
+      <div class="pill-row">
+        <button class="filter-pill selected" data-kind="all" onclick="setKind('all', this)">Everything</button>
+        <button class="filter-pill" data-kind="video" onclick="setKind('video', this)">Full Episodes</button>
+        <button class="filter-pill" data-kind="short" onclick="setKind('short', this)">Shorts</button>
+      </div>
+      <div class="search-box" style="flex: 1;">
+        🔍 <input type="search" id="videoSearch" placeholder="Search videos…" aria-label="Search videos">
+      </div>
+    </div>
+    <div class="result-count" id="videoCount"></div>
+
+    <div id="videosSection">
+      <div class="section-head"><h2>🎬 Full Episodes</h2></div>
+      <div class="video-grid" id="videoGrid"></div>
+    </div>
+
+    <div id="shortsSection" style="margin-top: 56px;">
+      <div class="section-head"><h2>⚡ Shorts</h2></div>
+      <div class="shorts-grid" id="shortsGrid"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="foot-inner">
+    <div>
+      <div class="foot-brand">
+        <img src="assets/logo-256.png" alt="Lawn Chair Sports logo">
+        <span>Lawn Chair Sports</span>
+      </div>
+      <p style="font-size:.9rem; opacity:.8">Sports first, everything else fair game.</p>
+    </div>
+    <div>
+      <h4>Site</h4>
+      <a href="index.html">Home</a>
+      <a href="episodes.html">Episodes</a>
+      <a href="videos.html">Watch</a>
+      <a href="merch.html">Merch</a>
+    </div>
+    <div>
+      <h4>Listen &amp; Follow</h4>
+      <a href="https://www.youtube.com/@LawnChairSports" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://open.spotify.com/show/6yltvYYxBwfoZ1ynX7QbSp" target="_blank" rel="noopener">Spotify</a>
+      <a href="https://podcasts.apple.com/us/podcast/lawn-chair-sports/id1840305521" target="_blank" rel="noopener">Apple Podcasts</a>
+      <a href="https://music.amazon.com/podcasts/cc2bcb3d-d4c5-49ec-8ab1-ab686f7c5260/lawn-chair-sports" target="_blank" rel="noopener">Amazon Music</a>
+      <a href="https://www.instagram.com/lawnchairsportsshow/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.tiktok.com/@lawnchairsportsshow" target="_blank" rel="noopener">TikTok</a>
+    </div>
+  </div>
+  <div class="copyright">© 2026 Lawn Chair Sports Podcast · Pull up a chair.</div>
+</footer>
+
+<script src="js/products.js"></script>
+<script src="js/app.js"></script>
+<script>
+let currentKind = 'all';
+
+function setKind(kind, btn) {
+  currentKind = kind;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  renderVideos();
+}
+
+function renderVideos() {
+  const all = LCS.videos.videos;
+  const q = document.getElementById('videoSearch').value.trim().toLowerCase();
+  const match = v => !q || v.title.toLowerCase().includes(q);
+
+  const videos = all.filter(v => v.kind === 'video' && match(v));
+  const shorts = all.filter(v => v.kind === 'short' && match(v));
+
+  const showVideos = currentKind !== 'short';
+  const showShorts = currentKind !== 'video';
+
+  document.getElementById('videosSection').style.display = showVideos && videos.length ? '' : 'none';
+  document.getElementById('shortsSection').style.display = showShorts && shorts.length ? '' : 'none';
+
+  if (showVideos) document.getElementById('videoGrid').innerHTML = videos.map(videoCardHTML).join('');
+  if (showShorts) document.getElementById('shortsGrid').innerHTML = shorts.map(shortCardHTML).join('');
+
+  const n = (showVideos ? videos.length : 0) + (showShorts ? shorts.length : 0);
+  document.getElementById('videoCount').textContent =
+    q ? `${n} video${n === 1 ? '' : 's'} matching “${q}”` : `${n} videos`;
+  observeReveals();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadVideos();
+  renderVideos();
+  document.getElementById('videoSearch').addEventListener('input', renderVideos);
+});
+</script>
+</body>
+</html>

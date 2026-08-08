@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merch Admin — Lawn Chair Sports</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="assets/logo-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <nav class="nav">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-256.png" alt="Lawn Chair Sports logo">
+      <span>Lawn Chair Sports</span>
+    </a>
+    <div class="nav-links" style="display:flex;">
+      <a href="merch.html">← Back to Store</a>
+      <a href="admin.html" class="active">Merch Admin</a>
+    </div>
+  </nav>
+</header>
+<div class="webbing"></div>
+<div class="admin-banner">
+  🔧 <strong>The Commissioner's Office.</strong> Changes save to <em>this browser</em> instantly (the store picks them up right away).
+  To make them permanent for everyone, hit <strong>Export catalog</strong> and replace <code>js/products.js</code> in the site folder.
+</div>
+
+<section class="block" style="padding-top: 40px;">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>🪑 Manage the Merch Stand</h2>
+    </div>
+
+    <div class="admin-toolbar">
+      <button class="btn btn-green" onclick="startNew()">+ Add Product</button>
+      <button class="btn btn-gold" onclick="exportCatalog()">⬇ Export catalog (products.js)</button>
+      <button class="btn btn-outline" style="color: var(--rust); border-color: var(--rust);" onclick="resetCatalog()">Reset to built-in catalog</button>
+    </div>
+    <div class="result-count" id="adminCount"></div>
+
+    <div class="admin-layout">
+      <div class="admin-list" id="adminList"></div>
+
+      <form class="admin-form" id="editorForm" onsubmit="return saveProduct(event)">
+        <h3 id="editorTitle">Add a Product</h3>
+        <div class="field">
+          <label for="fName">Name</label>
+          <input type="text" id="fName" required placeholder="Backyard Banter Hoodie">
+        </div>
+        <div class="field">
+          <label for="fTag">Category tag</label>
+          <input type="text" id="fTag" placeholder="Apparel / Headwear / Tailgate Gear…">
+        </div>
+        <div class="field">
+          <label for="fPrice">Price (USD)</label>
+          <input type="number" id="fPrice" required min="0" step="0.01" placeholder="28.00">
+        </div>
+        <div class="field">
+          <label for="fSizes">Sizes (comma-separated, blank = one size)</label>
+          <input type="text" id="fSizes" placeholder="S, M, L, XL, 2XL">
+        </div>
+        <div class="field">
+          <label for="fDesc">Description</label>
+          <textarea id="fDesc" placeholder="Sell it like Andy would."></textarea>
+        </div>
+        <div class="field">
+          <label>Product photo</label>
+          <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+            <div class="img-preview" id="imgPreview">No photo —<br>uses badge art</div>
+            <div style="flex:1; min-width:180px; display:flex; flex-direction:column; gap:8px;">
+              <input type="url" id="fImageUrl" placeholder="Paste an image URL…" oninput="previewFromUrl()">
+              <input type="file" id="fImageFile" accept="image/*" onchange="previewFromFile()">
+              <button type="button" class="icon-btn" onclick="clearImage()">Remove photo</button>
+            </div>
+          </div>
+          <div class="hint">Uploaded photos are stored inside the catalog itself — keep them under ~500 KB each.</div>
+        </div>
+        <div class="form-btn-row">
+          <button class="btn btn-rust" type="submit" id="saveBtn">Save Product</button>
+          <button class="btn btn-outline" type="button" style="color: var(--green); border-color: var(--green);" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="copyright">© 2026 Lawn Chair Sports Podcast · Commissioner's Office</div>
+</footer>
+
+<script src="js/products.js"></script>
+<script>
+const ADMIN_KEY = 'lcs_products_admin_v1';
+let catalog = loadCatalog();
+let editingId = null;   // null = adding new
+let pendingImage = null; // data URI or URL chosen in the form
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function loadCatalog() {
+  try {
+    const o = JSON.parse(localStorage.getItem(ADMIN_KEY));
+    if (Array.isArray(o) && o.length) return o;
+  } catch {}
+  // deep-copy the built-in catalog so edits never mutate products.js state
+  return JSON.parse(JSON.stringify(window.PRODUCTS || []));
+}
+
+function persist() {
+  localStorage.setItem(ADMIN_KEY, JSON.stringify(catalog));
+  renderList();
+}
+
+function artFor(p) {
+  if (p.image) return `<img src="${p.image}" alt="">`;
+  if (p.art) return p.art;
+  return '🪑';
+}
+
+function renderList() {
+  document.getElementById('adminCount').textContent =
+    `${catalog.length} product${catalog.length === 1 ? '' : 's'} in the store`;
+  document.getElementById('adminList').innerHTML = catalog.map((p, i) => `
+    <div class="admin-row ${p.id === editingId ? 'editing' : ''}">
+      <div class="admin-row-art">${artFor(p)}</div>
+      <div>
+        <div class="admin-row-name">${escapeHtml(p.name)}</div>
+        <div class="admin-row-meta">$${Number(p.price).toFixed(2)} · ${escapeHtml(p.tag || 'No tag')}${p.sizes && p.sizes.length ? ' · ' + p.sizes.join('/') : ''}</div>
+      </div>
+      <div class="admin-row-actions">
+        <button class="icon-btn" onclick="moveProduct(${i}, -1)" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
+        <button class="icon-btn" onclick="moveProduct(${i}, 1)" ${i === catalog.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
+        <button class="icon-btn" onclick="startEdit('${p.id}')">Edit</button>
+        <button class="icon-btn danger" onclick="deleteProduct('${p.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ---------- editor ---------- */
+function startNew() {
+  editingId = null;
+  pendingImage = null;
+  document.getElementById('editorTitle').textContent = 'Add a Product';
+  document.getElementById('saveBtn').textContent = 'Add Product';
+  document.getElementById('editorForm').reset();
+  updatePreview();
+  renderList();
+  document.getElementById('fName').focus();
+}
+
+function startEdit(id) {
+  const p = catalog.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  pendingImage = p.image || null;
+  document.getElementById('editorTitle').textContent = 'Edit: ' + p.name;
+  document.getElementById('saveBtn').textContent = 'Save Changes';
+  document.getElementById('fName').value = p.name;
+  document.getElementById('fTag').value = p.tag || '';
+  document.getElementById('fPrice').value = p.price;
+  document.getElementById('fSizes').value = p.sizes ? p.sizes.join(', ') : '';
+  document.getElementById('fDesc').value = p.desc || '';
+  document.getElementById('fImageUrl').value = (p.image && !p.image.startsWith('data:')) ? p.image : '';
+  document.getElementById('fImageFile').value = '';
+  updatePreview();
+  renderList();
+  document.getElementById('editorForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cancelEdit() { startNew(); }
+
+function slugify(name) {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'product';
+  let slug = base, n = 2;
+  while (catalog.some(p => p.id === slug && p.id !== editingId)) slug = `${base}-${n++}`;
+  return slug;
+}
+
+function saveProduct(e) {
+  e.preventDefault();
+  const name = document.getElementById('fName').value.trim();
+  const price = parseFloat(document.getElementById('fPrice').value);
+  if (!name || isNaN(price)) return false;
+  const sizesRaw = document.getElementById('fSizes').value.trim();
+  const data = {
+    name,
+    tag: document.getElementById('fTag').value.trim(),
+    price: Math.round(price * 100) / 100,
+    sizes: sizesRaw ? sizesRaw.split(',').map(s => s.trim()).filter(Boolean) : null,
+    desc: document.getElementById('fDesc').value.trim(),
+  };
+  const wasEditing = !!editingId;
+  if (editingId) {
+    const p = catalog.find(x => x.id === editingId);
+    Object.assign(p, data);
+    p.image = pendingImage || null;
+    if (p.image) delete p.art;
+  } else {
+    catalog.push({ id: slugify(name), ...data, image: pendingImage || null });
+  }
+  persist();
+  startNew();
+  showSaved(wasEditing ? 'Product updated ✅' : 'Product added ✅');
+  return false;
+}
+
+function deleteProduct(id) {
+  const p = catalog.find(x => x.id === id);
+  if (!p) return;
+  if (!confirm(`Delete “${p.name}” from the store?`)) return;
+  catalog = catalog.filter(x => x.id !== id);
+  if (editingId === id) startNew();
+  persist();
+  showSaved('Product deleted');
+}
+
+function moveProduct(i, delta) {
+  const j = i + delta;
+  if (j < 0 || j >= catalog.length) return;
+  [catalog[i], catalog[j]] = [catalog[j], catalog[i]];
+  persist();
+}
+
+/* ---------- images ---------- */
+function updatePreview() {
+  const box = document.getElementById('imgPreview');
+  box.innerHTML = pendingImage
+    ? `<img src="${pendingImage}" alt="Preview">`
+    : 'No photo —<br>uses badge art';
+}
+
+function previewFromUrl() {
+  const url = document.getElementById('fImageUrl').value.trim();
+  pendingImage = url || null;
+  updatePreview();
+}
+
+function previewFromFile() {
+  const file = document.getElementById('fImageFile').files[0];
+  if (!file) return;
+  if (file.size > 800 * 1024) {
+    alert('That image is over 800 KB — please use a smaller one so the store stays fast.');
+    document.getElementById('fImageFile').value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    pendingImage = reader.result;
+    document.getElementById('fImageUrl').value = '';
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  pendingImage = null;
+  document.getElementById('fImageUrl').value = '';
+  document.getElementById('fImageFile').value = '';
+  updatePreview();
+}
+
+/* ---------- catalog-level actions ---------- */
+function exportCatalog() {
+  const header = '/* Lawn Chair Sports — merch catalog (exported from admin.html) */\n\n';
+  const js = header + 'window.PRODUCTS = ' + JSON.stringify(catalog, null, 2) + ';\n';
+  const blob = new Blob([js], { type: 'text/javascript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'products.js';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showSaved('Exported! Replace js/products.js with the downloaded file.');
+}
+
+function resetCatalog() {
+  if (!confirm('Throw out your local edits and restore the built-in catalog?')) return;
+  localStorage.removeItem(ADMIN_KEY);
+  catalog = loadCatalog();
+  startNew();
+  showSaved('Catalog reset');
+}
+
+let savedTimer;
+function showSaved(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'toast';
+    el.id = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(savedTimer);
+  savedTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+renderList();
+startNew();
+</script>
+</body>
+</html>

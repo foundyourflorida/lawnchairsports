@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episodes — Lawn Chair Sports</title>
+<meta name="description" content="Every episode of the Lawn Chair Sports Podcast. Stream all 47+ episodes of NFL, NBA, scandals, and backyard banter right here.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Episodes — Lawn Chair Sports">
+<meta property="og:description" content="Stream every episode of the Lawn Chair Sports Podcast, right from your lawn chair.">
+<meta property="og:image" content="assets/artwork-800.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/logo-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <nav class="nav">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-256.png" alt="Lawn Chair Sports logo">
+      <span>Lawn Chair Sports</span>
+    </a>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="episodes.html" class="active">Episodes</a>
+      <a href="videos.html">Watch</a>
+      <a href="merch.html">Merch</a>
+      <a href="index.html#about">About</a>
+    </div>
+    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count">0</span></button>
+  </nav>
+</header>
+<div class="webbing"></div>
+
+<section class="hero" style="padding: 0;">
+  <div class="wrap" style="padding-top: 44px; padding-bottom: 44px;">
+    <span class="kicker" style="display:inline-block;background:var(--gold);color:var(--green-deep);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:2px;padding:5px 14px;border-radius:999px;margin-bottom:14px;">The Full Archive</span>
+    <h1 style="font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 10px;">Every Episode</h1>
+    <p style="opacity:.9; max-width: 40rem;">Stream every take we've ever recorded, right from your lawn chair. Search below or just start scrolling.</p>
+  </div>
+</section>
+<div class="webbing"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="toolbar">
+      <div class="search-box">
+        🔍 <input type="search" id="searchInput" placeholder="Search episodes… (try &quot;NBA&quot;, &quot;playoffs&quot;, &quot;scandal&quot;)" aria-label="Search episodes">
+      </div>
+      <select id="sortSelect" aria-label="Sort episodes">
+        <option value="new">Newest First</option>
+        <option value="old">Oldest First</option>
+        <option value="long">Longest First</option>
+      </select>
+    </div>
+    <div class="result-count" id="resultCount"></div>
+    <div class="ep-list" id="episodeList"></div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="foot-inner">
+    <div>
+      <div class="foot-brand">
+        <img src="assets/logo-256.png" alt="Lawn Chair Sports logo">
+        <span>Lawn Chair Sports</span>
+      </div>
+      <p style="font-size:.9rem; opacity:.8">Sports first, everything else fair game.</p>
+    </div>
+    <div>
+      <h4>Site</h4>
+      <a href="index.html">Home</a>
+      <a href="episodes.html">Episodes</a>
+      <a href="videos.html">Watch</a>
+      <a href="merch.html">Merch</a>
+    </div>
+    <div>
+      <h4>Listen &amp; Follow</h4>
+      <a href="https://www.youtube.com/@LawnChairSports" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://open.spotify.com/show/6yltvYYxBwfoZ1ynX7QbSp" target="_blank" rel="noopener">Spotify</a>
+      <a href="https://podcasts.apple.com/us/podcast/lawn-chair-sports/id1840305521" target="_blank" rel="noopener">Apple Podcasts</a>
+      <a href="https://music.amazon.com/podcasts/cc2bcb3d-d4c5-49ec-8ab1-ab686f7c5260/lawn-chair-sports" target="_blank" rel="noopener">Amazon Music</a>
+      <a href="https://www.instagram.com/lawnchairsportsshow/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.tiktok.com/@lawnchairsportsshow" target="_blank" rel="noopener">TikTok</a>
+    </div>
+  </div>
+  <div class="copyright">© 2026 Lawn Chair Sports Podcast · Pull up a chair.</div>
+</footer>
+
+<script src="js/products.js"></script>
+<script src="js/app.js"></script>
+<script>
+let allEpisodes = [];
+
+function durationSeconds(d) {
+  if (!d) return 0;
+  const parts = d.split(':').map(Number);
+  return parts.reduce((acc, v) => acc * 60 + v, 0);
+}
+
+function renderList() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+
+  let list = allEpisodes.filter(ep =>
+    !q || ep.title.toLowerCase().includes(q) || ep.description.toLowerCase().includes(q));
+
+  if (sort === 'old') list = [...list].reverse();
+  if (sort === 'long') list = [...list].sort((a, b) => durationSeconds(b.duration) - durationSeconds(a.duration));
+
+  LCS.playingList = list;
+  document.getElementById('resultCount').textContent =
+    q ? `${list.length} episode${list.length === 1 ? '' : 's'} matching “${q}”` : `${list.length} episodes`;
+
+  document.getElementById('episodeList').innerHTML = list.length ? list.map((ep, i) => `
+    <article class="ep-row">
+      ${epThumbHTML(ep, i)}
+      <div>
+        ${ep.episode ? `<div class="ep-num">EP. ${ep.episode}</div>` : ''}
+        <div class="ep-title">${escapeHtml(ep.title)}</div>
+        <div class="ep-meta" style="margin: 6px 0;">${(!q && sort === 'new' && i === 0) ? '<span class="new-badge">NEW</span>' : ''}<span>${ep.dateDisplay}</span>${ep.duration ? `<span class="dot">${ep.duration}</span>` : ''}</div>
+        <p class="ep-desc">${escapeHtml(ep.description)}</p>
+      </div>
+      <div class="ep-actions">
+        <button class="btn btn-green" onclick="playEpisode(${i})">▶ Play</button>
+        ${ep.videoId ? `<button class="btn btn-rust" onclick="openVideo('${ep.videoId}', false)">📺 Watch</button>` : ''}
+      </div>
+    </article>`).join('')
+    : '<div style="text-align:center; padding: 50px 0; color: #4a5c50;">No episodes found. Even our takes aren\'t that obscure. Try another search!</div>';
+  observeReveals();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const data = await loadEpisodes();
+  allEpisodes = data.episodes;
+  renderList();
+  document.getElementById('searchInput').addEventListener('input', renderList);
+  document.getElementById('sortSelect').addEventListener('change', renderList);
+});
+</script>
+</body>
+</html>

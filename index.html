@@ -49,7 +49,6 @@ src="https://www.facebook.com/tr?id=1655684602876435&ev=PageView&noscript=1"
       <a href="merch.html">Merch</a>
       <a href="index.html#about">About</a>
     </div>
-    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count">0</span></button>
   </nav>
 </header>
 <div class="webbing"></div>
@@ -226,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-body">
         <div class="product-tag">${escapeHtml(p.tag || '')}</div>
         <div class="product-name">${escapeHtml(p.name)}</div>
-        <div class="product-price">$${p.price.toFixed(2)}</div>
+        <div class="product-price">${p.fromPrice ? 'From ' : ''}$${p.price.toFixed(2)}</div>
         <a href="merch.html" class="btn btn-green">View in Store</a>
       </div>
     </article>`).join('');

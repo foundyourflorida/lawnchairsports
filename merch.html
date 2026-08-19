@@ -49,7 +49,6 @@ src="https://www.facebook.com/tr?id=1655684602876435&ev=PageView&noscript=1"
       <a href="merch.html" class="active">Merch</a>
       <a href="index.html#about">About</a>
     </div>
-    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count">0</span></button>
   </nav>
 </header>
 <div class="webbing"></div>
@@ -58,7 +57,7 @@ src="https://www.facebook.com/tr?id=1655684602876435&ev=PageView&noscript=1"
   <div class="wrap" style="padding-top: 44px; padding-bottom: 44px;">
     <span style="display:inline-block;background:var(--gold);color:var(--green-deep);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:2px;padding:5px 14px;border-radius:999px;margin-bottom:14px;">Official Merch Stand</span>
     <h1 style="font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 10px;">Wear the Take</h1>
-    <p style="opacity:.9; max-width: 40rem;">Rep the backyard's finest sports podcast. Free shipping on orders over $50.</p>
+    <p style="opacity:.9; max-width: 40rem;">Official Lawn Chair Sports merch — printed on demand and shipped to your door. Secure checkout at shop.lawnchairsportsshow.com.</p>
   </div>
 </section>
 <div class="webbing"></div>
@@ -116,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="product-body">
         <div class="product-tag">${escapeHtml(p.tag || '')}</div>
         <div class="product-name">${escapeHtml(p.name)}</div>
-        <div class="product-price">$${p.price.toFixed(2)}</div>
+        <div class="product-price">${p.fromPrice ? 'From ' : ''}$${p.price.toFixed(2)}</div>
         <p class="product-desc">${escapeHtml(p.desc || '')}</p>
         ${p.buyUrl
           ? `<a class="btn btn-rust" href="${p.buyUrl}" target="_blank" rel="noopener">🛒 Buy Now</a>`

@@ -101,9 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="product-name">${escapeHtml(p.name)}</div>
         <div class="product-price">$${p.price.toFixed(2)}</div>
         <p class="product-desc">${escapeHtml(p.desc || '')}</p>
-        ${p.sizes && p.sizes.length ? `<div class="size-row">${p.sizes.map(s =>
-          `<button class="size-pill" onclick="pickSize('${p.id}','${s}',this)">${s}</button>`).join('')}</div>` : ''}
-        <button class="btn btn-rust" onclick="addToCart('${p.id}', selectedSizes['${p.id}'])">Add to Cart</button>
+        ${p.buyUrl
+          ? `<a class="btn btn-rust" href="${p.buyUrl}" target="_blank" rel="noopener">🛒 Buy Now</a>`
+          : `${p.sizes && p.sizes.length ? `<div class="size-row">${p.sizes.map(s =>
+              `<button class="size-pill" onclick="pickSize('${p.id}','${s}',this)">${s}</button>`).join('')}</div>` : ''}
+             <button class="btn btn-rust" onclick="addToCart('${p.id}', selectedSizes['${p.id}'])">Add to Cart</button>`}
       </div>
     </article>`).join('');
   observeReveals();

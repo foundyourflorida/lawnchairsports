@@ -70,6 +70,11 @@
           <textarea id="fDesc" placeholder="Sell it like Andy would."></textarea>
         </div>
         <div class="field">
+          <label for="fBuyUrl">Checkout link (Fourthwall product URL)</label>
+          <input type="url" id="fBuyUrl" placeholder="https://lawn-chair-sports-shop.fourthwall.com/products/…">
+          <div class="hint">With a link, the store shows a real “Buy Now” button that opens Fourthwall checkout. Without one, it falls back to the demo cart.</div>
+        </div>
+        <div class="field">
           <label>Product photo</label>
           <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
             <div class="img-preview" id="imgPreview">No photo —<br>uses badge art</div>
@@ -168,6 +173,7 @@ function startEdit(id) {
   document.getElementById('fPrice').value = p.price;
   document.getElementById('fSizes').value = p.sizes ? p.sizes.join(', ') : '';
   document.getElementById('fDesc').value = p.desc || '';
+  document.getElementById('fBuyUrl').value = p.buyUrl || '';
   document.getElementById('fImageUrl').value = (p.image && !p.image.startsWith('data:')) ? p.image : '';
   document.getElementById('fImageFile').value = '';
   updatePreview();
@@ -196,6 +202,7 @@ function saveProduct(e) {
     price: Math.round(price * 100) / 100,
     sizes: sizesRaw ? sizesRaw.split(',').map(s => s.trim()).filter(Boolean) : null,
     desc: document.getElementById('fDesc').value.trim(),
+    buyUrl: document.getElementById('fBuyUrl').value.trim() || null,
   };
   const wasEditing = !!editingId;
   if (editingId) {

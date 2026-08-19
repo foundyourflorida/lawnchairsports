@@ -16,7 +16,9 @@
       "Bash(curl -s -o /dev/null -w \"lawnchairsportsshow.com: %{http_code}\\\\n\" \"https://rdap.verisign.com/com/v1/domain/lawnchairsportsshow.com\")",
       "Bash(curl -s -o /dev/null -w \"lawnchairsportsco.com:   %{http_code} \\(yours, for comparison\\)\\\\n\" \"https://rdap.verisign.com/com/v1/domain/lawnchairsportsco.com\")",
       "Bash(dig +short lawnchairsportsshow.com A)",
-      "Bash(dig +short lawnchairsportsshow.com NS)"
+      "Bash(dig +short lawnchairsportsshow.com NS)",
+      "Bash(dig +short lawnchairsportsshow.com A @1.1.1.1)",
+      "Bash(dig +short www.lawnchairsportsshow.com CNAME @1.1.1.1)"
     ]
   }
 }
